@@ -255,7 +255,7 @@ resource "kubernetes_deployment" "ghost-image" {
           env {
 
               name  = "url"
-              value = "https://${var.hostnames}"
+              value = "https://localhost:2368"
 
               }
 
@@ -274,7 +274,7 @@ resource "kubernetes_deployment" "ghost-image" {
               nfs {
 
                   server = "nfs.default.svc.cluster.local"
-                  path   = "/exports/${ var.name }"
+                  path   = "/exports/${var.x}"
 
                     }
                 }
