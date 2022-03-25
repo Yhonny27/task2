@@ -97,9 +97,14 @@ resource "google_container_node_pool" "cluster_nodes" {
     ]
   }
 }
+resource "random_string" "random" {
+  length           = 8
+  special          = false
+  upper            = false
+}
 #5 Create the SQL instance DB
 resource "google_sql_database_instance" "instance27" {
-  name             = "instance27"
+  name             = "instance27${random_string.random.result}"
   region           = "us-central1"
   database_version = "MYSQL_5_6"
 
