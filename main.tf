@@ -303,7 +303,6 @@ resource "kubernetes_service" "service" {
 
     spec {
 
-        default = true
         type = "LoadBalancer"
 
         selector = {
