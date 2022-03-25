@@ -242,7 +242,7 @@ resource "kubernetes_service" "service" {
 
   spec {
 
-    type = "LoadBalancer"
+    type = "ClusterIP"
 
     selector = {
 
