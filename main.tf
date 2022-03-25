@@ -152,13 +152,11 @@ resource "kubernetes_deployment" "ghost-image" {
   }
   spec {
     replicas = 2
-
     selector {
       match_labels = {
         app = "ghost-image"
       }
     }
-  }
     template {
       metadata {
       name =      "ghost-image"
@@ -166,28 +164,28 @@ resource "kubernetes_deployment" "ghost-image" {
           app = "ghost-image"
         }
       }
-    }
       spec {
       
       node_selector = null
+        
         container {
           image = "ghost:4-alpine"
           description = "docker image"
           name  = "ghost-image"
-        }
         
         port {
 
           container_port = 2368
           protocol       = "TCP"
 
-            }
       }
           resources {
 
             requests = {
+              
               cpu    = "50m"
               memory = "50Mi"
+              
             }
           
             limits = {
@@ -268,6 +266,7 @@ resource "kubernetes_deployment" "ghost-image" {
               mount_path = "/var/lib/ghost/content"
 
               }
+        }
 
           volume {
 
@@ -279,8 +278,10 @@ resource "kubernetes_deployment" "ghost-image" {
                   path   = "/exports/${ ghost-image }"
 
                     }
-
                 }
+            }
+        }
+    }
 }
 
 # 8. Create a service and ingress for the previous deployment. Test it in your browser.
