@@ -66,12 +66,6 @@ resource "google_container_cluster" "private-cluster" {
   network    = "projects/projectx-344700/global/networks/demo-network"
   subnetwork = "projects/projectx-344700/regions/us-central1/subnetworks/demo-subnet"
 
-  private_cluster_config {
-    enable_private_endpoint = true
-    enable_private_nodes    = true
-    master_ipv4_cidr_block  = "10.42.0.0/28"
-  }
-
   master_authorized_networks_config {}
 
   ip_allocation_policy {
