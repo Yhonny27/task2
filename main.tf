@@ -70,8 +70,9 @@ resource "google_container_cluster" "private-cluster" {
     enable_private_nodes    = true
     master_ipv4_cidr_block  = "10.42.0.0/28"
   }
-  master_authorized_networks_config {}
-
+  master_authorized_networks_config {
+    cidr_blocks { cidr_block=35.193.14.101/32 }
+  }
   ip_allocation_policy {
     cluster_secondary_range_name  = google_compute_subnetwork.demo-subnet.secondary_ip_range[0].range_name
     services_secondary_range_name = google_compute_subnetwork.demo-subnet.secondary_ip_range[1].range_name
