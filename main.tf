@@ -175,51 +175,12 @@ resource "kubernetes_deployment" "ghost-image" {
 
           port {
 
-            container_port = 2368
+            container_port = 80
             protocol       = "TCP"
 
           }
-          resources {
-
-            requests = {
-
-              cpu    = "50m"
-              memory = "50Mi"
-
-            }
-
-            limits = {
-              cpu    = "1000m"
-              memory = "200Mi"
-            }
-          }
-
-          liveness_probe {
-
-            tcp_socket {
-
-              port = 2368
-
-            }
-
-            initial_delay_seconds = 15
-            period_seconds        = 15
-
-          }
-
-          readiness_probe {
-
-            tcp_socket {
-
-              port = 2368
-
-            }
-
-            initial_delay_seconds = 15
-            period_seconds        = 15
-          }
         }
-      }
+       }   
     }
   }
 }
@@ -252,8 +213,8 @@ resource "kubernetes_service" "service" {
 
     port {
 
-      port        = 2368
-      target_port = 2368
+      port        = 80
+      target_port = 9376
       protocol    = "TCP"
     }
 
