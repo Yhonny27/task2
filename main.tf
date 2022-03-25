@@ -148,7 +148,7 @@ resource "kubernetes_deployment" "ghost-image" {
     name      = "ghost-image"
     namespace = "yhonathan-camacho"
     labels = {
-      test = "Demo"
+      app = "ghost-image"
     }
   }
   spec {
@@ -170,7 +170,7 @@ resource "kubernetes_deployment" "ghost-image" {
         node_selector = null
 
         container {
-          image = "ghost:4-alpine"
+          image = "ghost:alpine"
           name  = "ghost-image"
 
           port {
