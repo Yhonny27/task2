@@ -2,7 +2,7 @@ variable "hostnames" {
 
     type        = string
     description = "my hostname (i.e.: yhonathan.io"
-    default       = "yhonathan.io"
+    default       = "localhost:2368"
 
 }
 
