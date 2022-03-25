@@ -1,31 +1,4 @@
-# 1. Create a custom service account to create GKE clusters.
-resource "google_service_account" "gke_user" {
-  account_id   = "gke-user"
-  display_name = "gke User"
-}
-resource "google_project_iam_binding" "gke_usera" {
-  project            = "projectx-344700"
-  role               = "roles/gkehub.admin"
-  members = [
-    "serviceAccount:${google_service_account.gke_user.email}",
-  ]
-}
-resource "google_project_iam_binding" "store_userb" {
-  project            = "projectx-344700"
-  role               = "roles/storage.objectAdmin"
-
-  members = [
-    "serviceAccount:${google_service_account.gke_user.email}",
-  ]
-}
-variable "x" {
-
-    type        = string
-    description = "ghost-image"
-    default     = "ghost-image"
-
-}
-#2. Create VPC network called "demo-network"
+#. Create VPC network called "demo-network"
 resource "google_compute_network" "demo-network" {
   provider = google-beta
   project  = "projectx-344700"
