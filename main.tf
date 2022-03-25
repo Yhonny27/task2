@@ -4,15 +4,15 @@ resource "google_service_account" "gke_user" {
   display_name = "gke User"
 }
 resource "google_project_iam_binding" "gke_usera" {
-  project            = "projectx-344700"
-  role               = "roles/gkehub.admin"
+  project = "projectx-344700"
+  role    = "roles/gkehub.admin"
   members = [
     "serviceAccount:${google_service_account.gke_user.email}",
   ]
 }
 resource "google_project_iam_binding" "store_userb" {
-  project            = "projectx-344700"
-  role               = "roles/storage.objectAdmin"
+  project = "projectx-344700"
+  role    = "roles/storage.objectAdmin"
 
   members = [
     "serviceAccount:${google_service_account.gke_user.email}",
@@ -22,12 +22,12 @@ resource "google_project_iam_binding" "store_userb" {
 resource "google_compute_network" "demo-network" {
   provider = google-beta
   project  = "projectx-344700"
-  name = "demo-network"
+  name     = "demo-network"
 }
 #Private IP
 resource "google_compute_global_address" "private-ip-address" {
-  provider = google-beta
-  project  = "projectx-344700"
+  provider      = google-beta
+  project       = "projectx-344700"
   name          = "private-ip-address"
   purpose       = "VPC_PEERING"
   address_type  = "INTERNAL"
@@ -35,33 +35,33 @@ resource "google_compute_global_address" "private-ip-address" {
   network       = "projects/projectx-344700/global/networks/demo-network"
 }
 resource "google_service_networking_connection" "private_vpc_connection" {
-  provider = google-beta
+  provider                = google-beta
   network                 = "projects/projectx-344700/global/networks/demo-network"
   service                 = "servicenetworking.googleapis.com"
   reserved_peering_ranges = [google_compute_global_address.private-ip-address.name]
 }
 #Create subnetwork called demo-subnet
 resource "google_compute_subnetwork" "demo-subnet" {
-  name     = "demo-subnet"
-  region   = "us-central1"
-  network  = "projects/projectx-344700/global/networks/demo-network"
-  ip_cidr_range  = "10.0.36.0/24"
+  name                     = "demo-subnet"
+  region                   = "us-central1"
+  network                  = "projects/projectx-344700/global/networks/demo-network"
+  ip_cidr_range            = "10.0.36.0/24"
   private_ip_google_access = true
   secondary_ip_range {
-    range_name = "pod"
+    range_name    = "pod"
     ip_cidr_range = "172.16.0.0/16"
   }
   secondary_ip_range {
-    range_name ="services"
+    range_name    = "services"
     ip_cidr_range = "10.0.32.0/22"
   }
 }
 #3. Create GKE Cluster
 resource "google_container_cluster" "private-cluster" {
-  name               = "private-cluster"
-  location           = "us-central1"
+  name                     = "private-cluster"
+  location                 = "us-central1"
   remove_default_node_pool = true
-  initial_node_count = 1
+  initial_node_count       = 1
 
   network    = "projects/projectx-344700/global/networks/demo-network"
   subnetwork = "projects/projectx-344700/regions/us-central1/subnetworks/demo-subnet"
@@ -92,15 +92,15 @@ resource "google_container_node_pool" "cluster_nodes" {
 
     # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
     service_account = google_service_account.gke_user.email
-    oauth_scopes    = [
+    oauth_scopes = [
       "https://www.googleapis.com/auth/cloud-platform"
     ]
   }
 }
 resource "random_string" "random" {
-  length           = 8
-  special          = false
-  upper            = false
+  length  = 8
+  special = false
+  upper   = false
 }
 #5 Create the SQL instance DB
 resource "google_sql_database_instance" "instance27" {
@@ -111,22 +111,22 @@ resource "google_sql_database_instance" "instance27" {
   depends_on = [google_service_networking_connection.private_vpc_connection]
 
   settings {
-    tier = "db-n1-standard-1"
+    tier              = "db-n1-standard-1"
     activation_policy = "ALWAYS"
     ip_configuration {
-      ipv4_enabled = true
+      ipv4_enabled    = true
       private_network = "projects/projectx-344700/global/networks/demo-network"
     }
   }
-  deletion_protection  = "false"
+  deletion_protection = "false"
 }
 resource "google_sql_database" "databaseforghost" {
   name     = "databaseforghost"
   instance = google_sql_database_instance.instance27.name
-  charset = "UTF8"
+  charset  = "UTF8"
 }
 resource "google_sql_user" "user" {
-  name= "root"
+  name     = "root"
   instance = google_sql_database_instance.instance27.name
   password = "toor"
 }
@@ -147,7 +147,7 @@ resource "google_storage_bucket" "mysql_backup_task2" {
 }
 resource "kubernetes_deployment" "ghost-image" {
   metadata {
-    name =      "ghost-image"
+    name      = "ghost-image"
     namespace = "yhonathan-camacho"
     labels = {
       test = "Demo"
@@ -162,34 +162,34 @@ resource "kubernetes_deployment" "ghost-image" {
     }
     template {
       metadata {
-      name =      "ghost-image"
+        name = "ghost-image"
         labels = {
           app = "ghost-image"
         }
       }
       spec {
-      
-      node_selector = null
-        
+
+        node_selector = null
+
         container {
           image = "ghost:4-alpine"
           name  = "ghost-image"
-        
-        port {
 
-          container_port = 2368
-          protocol       = "TCP"
+          port {
 
-      }
+            container_port = 2368
+            protocol       = "TCP"
+
+          }
           resources {
 
             requests = {
-              
+
               cpu    = "50m"
               memory = "50Mi"
-              
+
             }
-          
+
             limits = {
               cpu    = "1000m"
               memory = "200Mi"
@@ -198,14 +198,14 @@ resource "kubernetes_deployment" "ghost-image" {
 
           liveness_probe {
 
-              tcp_socket {
+            tcp_socket {
 
-                port = 2368
+              port = 2368
 
-              }
+            }
 
-              initial_delay_seconds = 15
-              period_seconds        = 15
+            initial_delay_seconds = 15
+            period_seconds        = 15
 
           }
 
@@ -213,56 +213,52 @@ resource "kubernetes_deployment" "ghost-image" {
 
             tcp_socket {
 
-                port = 2368
+              port = 2368
 
             }
 
-              initial_delay_seconds = 15
-              period_seconds        = 15
-
+            initial_delay_seconds = 15
+            period_seconds        = 15
           }
-        }      
+        }
       }
+    }
+  }
+}
 # 8. Create a service and ingress for the previous deployment. Test it in your browser.
 #Service
 resource "kubernetes_service" "service" {
 
-    metadata {
+  metadata {
 
-        name      = "ghost-image"
-        namespace = "yhonathan-camacho"
+    name      = "ghost-image"
+    namespace = "yhonathan-camacho"
 
-        labels = {
+    labels = {
 
-            app = "ghost-image"
-
-        }
-
-    }
-
-    spec {
-
-        type = "LoadBalancer"
-
-        selector = {
-
-            app = "ghost-image"
-
-        }
-
-        port {
-
-            port        = 2368
-            target_port = 2368
-            protocol    = "TCP"
-          }
-
-        }
-
-      }
+      app = "ghost-image"
 
     }
 
   }
 
-}  
+  spec {
+
+    type = "LoadBalancer"
+
+    selector = {
+
+      app = "ghost-image"
+
+    }
+
+    port {
+
+      port        = 2368
+      target_port = 2368
+      protocol    = "TCP"
+    }
+
+  }
+
+}
