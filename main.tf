@@ -68,7 +68,7 @@ resource "google_container_cluster" "private-cluster" {
   private_cluster_config {
     enable_private_endpoint = false
     enable_private_nodes    = false
-    master_ipv4_cidr_block  = "10.42.0.0/28"
+    #master_ipv4_cidr_block  = "10.42.0.0/28"
   }
   master_authorized_networks_config {
     cidr_blocks { cidr_block="35.193.14.101/32" }
