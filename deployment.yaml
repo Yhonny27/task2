@@ -6,7 +6,7 @@ metadata:
   labels:
     app: ghost-image
   spec:
-    replicas: 1
+    replicas: 2
     selector:
       matchLabels:
         app: ghost-image
@@ -23,3 +23,12 @@ metadata:
           # ghost always starts on this port
           ports:
           - containerPort: 2368
+ volumeMounts:
+    	   # define persistent storage for themes and images
+    	   - mountPath: /var/lib/ghost/content/
+      	     name: pd-blog-volume
+      volumes:
+      - name: pd-blog-volume
+        persistentVolumeClaim:
+          claimName: pd-blog-volume-claim
+          
