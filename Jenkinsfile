@@ -12,9 +12,9 @@ pipeline {
                 sh label: '',script: 'terraform init'
             }
         }
-	stage('Terraform Destroy'){
+	stage('Terraform Apply'){
             steps{
-                sh label: '',script: 'terraform destroy -auto-approve'
+                sh label: '',script: 'terraform apply -auto-approve'
             }
         }
     }
