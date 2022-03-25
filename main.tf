@@ -397,4 +397,3 @@ resource "kubernetes_cron_job_v1" "demo" {
 
 # 10. Deploy a Jenkins server using a Bitnami image from Google Cloud Marketplace
 # 11. Install the requirement plugins (Terraform, git, etc)
-
