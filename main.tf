@@ -229,27 +229,27 @@ resource "kubernetes_deployment" "ghost-image" {
           env {
 
               name  = "database__connection__host"
-              value = databaseforghost
+              value = "databaseforghost"
           }
 
           env {
 
               name  = "database__connection__user"
-              value = root
+              value = "root"
 
           }
 
           env {
 
               name  = "database__connection__password"
-              value = toor
+              value = "toor"
 
           }
 
           env {
 
               name  = "database__connection__database"
-              value = instance27
+              value = "instance27"
 
           }
 
