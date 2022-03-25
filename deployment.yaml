@@ -1,21 +1,25 @@
-apiVersion: apps/v1
+#deployment
+apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: demo-deployment
+  name: ghost-image
   labels:
-    app: demo
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: demo
-  template:
-    metadata:
-      labels:
-        app: demo
-    spec:
-      containers:
-      - name: demo
-        image: ghost:alpine
-        ports:
-        - containerPort: 80
+    app: ghost-image
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: ghost-image
+    template:
+      metadata:
+        labels:
+          app: ghost-image
+      spec:
+        containers:
+        # ghost container
+        - name: ghost-container
+          image: ghost:alpine
+          imagePullPolicy: IfNotPresent
+          # ghost always starts on this port
+          ports:
+          - containerPort: 2368
