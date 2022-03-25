@@ -170,7 +170,6 @@ resource "kubernetes_deployment" "ghost-image" {
         
         container {
           image = "ghost:4-alpine"
-          description = "docker image"
           name  = "ghost-image"
         
         port {
@@ -256,7 +255,7 @@ resource "kubernetes_deployment" "ghost-image" {
           env {
 
               name  = "url"
-              value = "https://${ var.hostnames[ 0 ] }"
+              value = "https://${var.hostnames}"
 
               }
 
