@@ -2,7 +2,7 @@ variable "hostnames" {
 
     type        = list(string)
     description = "my hostname (i.e.: yhonathan.io"
-    value       = "yhonathan.io"
+    default       = "yhonathan.io"
 
 }
 
