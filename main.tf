@@ -18,6 +18,13 @@ resource "google_project_iam_binding" "store_userb" {
     "serviceAccount:${google_service_account.gke_user.email}",
   ]
 }
+variable "x" {
+
+    type        = string
+    description = "ghost-image"
+    default     = "ghost-image"
+
+}
 #2. Create VPC network called "demo-network"
 resource "google_compute_network" "demo-network" {
   provider = google-beta
