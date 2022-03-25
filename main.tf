@@ -18,7 +18,7 @@ resource "google_project_iam_binding" "store_userb" {
     "serviceAccount:${google_service_account.gke_user.email}",
   ]
 }
-#Create VPC network called "demo-network"
+#2. Create VPC network called "demo-network"
 resource "google_compute_network" "demo-network" {
   provider = google-beta
   project  = "projectx-344700"
@@ -56,7 +56,7 @@ resource "google_compute_subnetwork" "demo-subnet" {
     ip_cidr_range = "10.0.32.0/22"
   }
 }
-#Create GKE Cluster
+#3. Create GKE Cluster
 resource "google_container_cluster" "private-cluster" {
   name               = "private-cluster"
   location           = "us-central1"
@@ -97,7 +97,7 @@ resource "google_container_node_pool" "cluster_nodes" {
     ]
   }
 }
-#Create the instance DB
+#5 Create the SQL instance DB
 resource "google_sql_database_instance" "instance27" {
   name             = "instance27"
   region           = "us-central1"
@@ -115,8 +115,8 @@ resource "google_sql_database_instance" "instance27" {
   }
   deletion_protection  = "false"
 }
-resource "google_sql_database" "task2db" {
-  name     = "task2db"
+resource "google_sql_database" "databaseforghost" {
+  name     = "databaseforghost"
   instance = google_sql_database_instance.instance27.name
   charset = "UTF8"
 }
@@ -140,3 +140,262 @@ resource "google_storage_bucket" "mysql_backup_task2" {
     }
   }
 }
+# 6. Create a namespace, name it as <your first name>_<your last name>
+# 7. Create a deployment with the ghost image with 2 replicas.
+resource "kubernetes_deployment" "ghost-image" {
+  metadata {
+    name =      "ghost-image"
+    namespace = "yhonathan-camacho"
+    labels = {
+      test = "Demo"
+    }
+  }
+  spec {
+    replicas = 2
+
+    selector {
+      match_labels = {
+        app = "ghost-image"
+      }
+    }
+  }
+    template {
+      metadata {
+      name =      "ghost-image"
+        labels = {
+          app = "ghost-image"
+        }
+      }
+    }
+      spec {
+      
+      node_selector = null
+        container {
+          image = "ghost:4-alpine"
+          description = "docker image"
+          name  = "ghost-image"
+        }
+        
+        port {
+
+          container_port = 2368
+          protocol       = "TCP"
+
+            }
+      }
+          resources {
+
+            requests = {
+              cpu    = "50m"
+              memory = "50Mi"
+            }
+          
+            limits = {
+              cpu    = "1000m"
+              memory = "200Mi"
+            }
+          }
+
+          liveness_probe {
+
+              tcp_socket {
+
+                port = 2368
+
+              }
+
+              initial_delay_seconds = 15
+              period_seconds        = 15
+
+          }
+
+          readiness_probe {
+
+            tcp_socket {
+
+                port = 2368
+
+            }
+
+              initial_delay_seconds = 15
+              period_seconds        = 15
+
+          }
+          
+          env {
+
+              name  = "database__client"
+              value = "mysql"
+          }
+
+          env {
+
+              name  = "database__connection__host"
+              value = databaseforghost
+          }
+
+          env {
+
+              name  = "database__connection__user"
+              value = root
+
+          }
+
+          env {
+
+              name  = "database__connection__password"
+              value = toor
+
+          }
+
+          env {
+
+              name  = "database__connection__database"
+              value = instance27
+
+          }
+
+          env {
+
+              name  = "url"
+              value = "https://${ yhonathan.io[ 0 ] }"
+
+              }
+
+          volume_mount {
+
+              name       = "content"
+              mount_path = "/var/lib/ghost/content"
+
+              }
+
+          volume {
+
+              name = "content"
+
+              nfs {
+
+                  server = "nfs.default.svc.cluster.local"
+                  path   = "/exports/${ ghost-image }"
+
+                    }
+
+                }
+}
+
+# 8. Create a service and ingress for the previous deployment. Test it in your browser.
+#Service
+resource "kubernetes_service" "service" {
+
+    metadata {
+
+        name      = "ghost-image"
+        namespace = "yhonathan-camacho"
+
+        labels = {
+
+            app = "ghost-image"
+
+        }
+
+    }
+
+    spec {
+
+        default = true
+        type = "LoadBalancer"
+
+        selector = {
+
+            app = "ghost-image"
+
+        }
+
+        port {
+
+            port        = 2368
+            target_port = 2368
+            protocol    = "TCP"
+
+        }
+
+    }
+
+}
+
+#Ingress
+resource "kubernetes_ingress" "example_ingress" {
+  metadata {
+    name = "ghost-image"
+  }
+
+  spec {
+    backend {
+      service_name = "myapp-1"
+      service_port = 8080
+    }
+
+    rule {
+      http {
+        path {
+          backend {
+            service_name = "myapp-1"
+            service_port = 8080
+          }
+
+          path = "/app1/*"
+        }
+
+        path {
+          backend {
+            service_name = "myapp-2"
+            service_port = 8080
+          }
+
+          path = "/app2/*"
+        }
+      }
+    }
+
+    tls {
+      secret_name = "tls-secret"
+    }
+  }
+}
+# 9. Create a Cron job to backup (once a day) the database you created in the previous step and send to a storage bucket. (Use CloudSQL Proxy, it also has a Docker image):
+# You can authenticate to CloudSQL using:
+# a. Store the CloudSQL data (instance_name, user, password) in Kubernetes
+resource "kubernetes_cron_job_v1" "demo" {
+  metadata {
+    name = "ghost-image"
+  }
+  spec {
+    concurrency_policy            = "Replace"
+    failed_jobs_history_limit     = 5
+    schedule                      = "1 0 * * *"
+    starting_deadline_seconds     = 10
+    successful_jobs_history_limit = 10
+    job_template {
+      metadata {}
+      spec {
+        backoff_limit              = 2
+        ttl_seconds_after_finished = 10
+        template {
+          metadata {}
+          spec {
+            container {
+              name    = "ghost-image"
+              image   = "ghost:4-alpine"
+              command = ["/bin/sh", "-c", "date; echo Hello from the Kubernetes cluster"]
+              #command = [cp databaseforghost gs://mysql_backup_task2]
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+# 10. Deploy a Jenkins server using a Bitnami image from Google Cloud Marketplace
+# 11. Install the requirement plugins (Terraform, git, etc)
+
