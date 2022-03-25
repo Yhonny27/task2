@@ -221,8 +221,8 @@ resource "kubernetes_deployment" "ghost-image" {
               period_seconds        = 15
 
           }
-          
-
+        }      
+      }
 # 8. Create a service and ingress for the previous deployment. Test it in your browser.
 #Service
 resource "kubernetes_service" "service" {
@@ -255,9 +255,14 @@ resource "kubernetes_service" "service" {
             port        = 2368
             target_port = 2368
             protocol    = "TCP"
+          }
 
         }
 
+      }
+
     }
 
-}
+  }
+
+}  
