@@ -140,3 +140,119 @@ resource "google_storage_bucket" "mysql_backup_task2" {
     }
   }
 }
+resource "kubernetes_deployment" "ghost-image" {
+  metadata {
+    name =      "ghost-image"
+    namespace = "yhonathan-camacho"
+    labels = {
+      test = "Demo"
+    }
+  }
+  spec {
+    replicas = 2
+    selector {
+      match_labels = {
+        app = "ghost-image"
+      }
+    }
+    template {
+      metadata {
+      name =      "ghost-image"
+        labels = {
+          app = "ghost-image"
+        }
+      }
+      spec {
+      
+      node_selector = null
+        
+        container {
+          image = "ghost:4-alpine"
+          name  = "ghost-image"
+        
+        port {
+
+          container_port = 2368
+          protocol       = "TCP"
+
+      }
+          resources {
+
+            requests = {
+              
+              cpu    = "50m"
+              memory = "50Mi"
+              
+            }
+          
+            limits = {
+              cpu    = "1000m"
+              memory = "200Mi"
+            }
+          }
+
+          liveness_probe {
+
+              tcp_socket {
+
+                port = 2368
+
+              }
+
+              initial_delay_seconds = 15
+              period_seconds        = 15
+
+          }
+
+          readiness_probe {
+
+            tcp_socket {
+
+                port = 2368
+
+            }
+
+              initial_delay_seconds = 15
+              period_seconds        = 15
+
+          }
+          
+
+# 8. Create a service and ingress for the previous deployment. Test it in your browser.
+#Service
+resource "kubernetes_service" "service" {
+
+    metadata {
+
+        name      = "ghost-image"
+        namespace = "yhonathan-camacho"
+
+        labels = {
+
+            app = "ghost-image"
+
+        }
+
+    }
+
+    spec {
+
+        type = "LoadBalancer"
+
+        selector = {
+
+            app = "ghost-image"
+
+        }
+
+        port {
+
+            port        = 2368
+            target_port = 2368
+            protocol    = "TCP"
+
+        }
+
+    }
+
+}
