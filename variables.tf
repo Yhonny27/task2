@@ -1,6 +1,6 @@
 variable "hostnames" {
 
-    type        = list(string)
+    type        = string
     description = "my hostname (i.e.: yhonathan.io"
     default       = "yhonathan.io"
 
