@@ -143,10 +143,23 @@ resource "google_storage_bucket" "mysql_backup_task2" {
     }
   }
 }
+resource "kubernetes_namespace" "namespace" {
+  metadata {
+    annotations = {
+      name = "ghost-image"
+    }
+
+    labels = {
+      mylabel = "ghost-image"
+    }
+
+    name = "yhonathan-camacho"
+  }
+}
 resource "kubernetes_deployment" "ghost-image" {
   metadata {
     name      = "ghost-image"
-    namespace = "yhonathan-camacho"
+    namespace = kubernetes_namespace.namespace.metadata[0].name
     labels = {
       app = "ghost-image"
     }
@@ -191,7 +204,7 @@ resource "kubernetes_service" "service" {
   metadata {
 
     name      = "ghost-image"
-    namespace = "yhonathan-camacho"
+    namespace = kubernetes_namespace.namespace.metadata[0].name
 
     labels = {
 
