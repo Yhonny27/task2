@@ -24,6 +24,7 @@ resource "google_compute_network" "demo-network" {
   project  = "projectx-344700"
   name     = "demo-network"
 }
+
 #Private IP
 resource "google_compute_global_address" "private-ip-address" {
   provider      = google-beta
@@ -56,6 +57,23 @@ resource "google_compute_subnetwork" "demo-subnet" {
     ip_cidr_range = "10.0.32.0/22"
   }
 }
+resource "google_compute_router" "router" {
+  name    = "my-router"
+  region  = google_compute_subnetwork.demo-subnet.region
+  network = google_compute_network.demo-network.id
+}
+resource "google_compute_router_nat" "nat" {
+  name                               = "my-router-nat"
+  router                             = google_compute_router.router.name
+  region                             = google_compute_router.router.region
+  nat_ip_allocate_option             = "AUTO_ONLY"
+  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
+
+  log_config {
+    enable = true
+    filter = "ERRORS_ONLY"
+  }
+}
 #3. Create GKE Cluster
 resource "google_container_cluster" "private-cluster" {
   name                     = "private-cluster"
@@ -67,8 +85,8 @@ resource "google_container_cluster" "private-cluster" {
   subnetwork = "projects/projectx-344700/regions/us-central1/subnetworks/demo-subnet"
   private_cluster_config {
     enable_private_endpoint = false
-    enable_private_nodes    = false
-    #master_ipv4_cidr_block  = "10.42.0.0/28"
+    enable_private_nodes    = true
+    master_ipv4_cidr_block  = "10.42.0.0/28"
   }
   master_authorized_networks_config {
     cidr_blocks { cidr_block="35.193.14.101/32" }
