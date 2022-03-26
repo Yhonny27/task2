@@ -4,7 +4,7 @@ provider "google" {
   region       = "us-central1"
   zone         = "us-central1-c"
 }
-# data "google_client_config" "provider" {}
+data "google_client_config" "provider" {}
 # data "google_container_cluster" "my_cluster" {
 #   name     = "private-cluster"
 #   location = "us-central1"
