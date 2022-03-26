@@ -207,7 +207,7 @@ resource "kubernetes_deployment" "ghost-image" {
 
           port {
 
-            container_port = 80
+            container_port = 2368
             protocol       = "TCP"
 
           }
@@ -246,7 +246,7 @@ resource "kubernetes_service" "service" {
     port {
 
       port        = 80
-      target_port = 9376
+      target_port = 2368
       protocol    = "TCP"
     }
 
