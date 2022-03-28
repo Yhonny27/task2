@@ -25,11 +25,11 @@ resource "google_compute_global_address" "private-ip-address" {
   purpose       = "VPC_PEERING"
   address_type  = "INTERNAL"
   prefix_length = 16
-  network       = "projects/projectx-344700/global/networks/demo-network"
+  network       = google_compute_network.demo-network.id
 }
 resource "google_service_networking_connection" "private_vpc_connection" {
   provider                = google-beta
-  network                 = "projects/projectx-344700/global/networks/demo-network"
+  network                 = google_compute_network.demo-network.id
   service                 = "servicenetworking.googleapis.com"
   reserved_peering_ranges = [google_compute_global_address.private-ip-address.name]
 }
@@ -37,7 +37,7 @@ resource "google_service_networking_connection" "private_vpc_connection" {
 resource "google_compute_subnetwork" "demo-subnet" {
   name                     = "demo-subnet"
   region                   = "us-central1"
-  network                  = "projects/projectx-344700/global/networks/demo-network"
+  network                  = google_compute_network.demo-network.id
   ip_cidr_range            = "10.0.36.0/24"
   private_ip_google_access = true
   secondary_ip_range {
@@ -73,8 +73,8 @@ resource "google_container_cluster" "private-cluster" {
   remove_default_node_pool = true
   initial_node_count       = 1
 
-  network    = "projects/projectx-344700/global/networks/demo-network"
-  subnetwork = "projects/projectx-344700/regions/us-central1/subnetworks/demo-subnet"
+  network    = google_compute_network.demo-network.id
+  subnetwork = google_compute_subnetwork.demo-subnet.id
   private_cluster_config {
     enable_private_endpoint = false
     enable_private_nodes    = true
@@ -124,7 +124,7 @@ resource "google_sql_database_instance" "instance27" {
     activation_policy = "ALWAYS"
     ip_configuration {
       ipv4_enabled    = true
-      private_network = "projects/projectx-344700/global/networks/demo-network"
+      private_network = google_compute_network.demo-network.id
     }
   }
   deletion_protection = "false"
