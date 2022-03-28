@@ -164,8 +164,9 @@ resource "kubernetes_namespace_v1" "namespace" {
       mylabel = "ghost-image"
     }
 
-    name = "yhonatha-camacho"
+    name = "yhonathan-camacho"
   }
+  depends_on = [google_container_cluster.private-cluster]
 }
 resource "kubernetes_deployment" "ghost-image" {
   metadata {
