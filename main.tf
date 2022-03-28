@@ -164,7 +164,7 @@ resource "kubernetes_namespace_v1" "namespace" {
       mylabel = "ghost-image"
     }
 
-    name = "yhonathan-camacho"
+    name = "yhonatha-camacho"
   }
 }
 resource "kubernetes_deployment" "ghost-image" {
