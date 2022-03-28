@@ -154,6 +154,9 @@ resource "google_storage_bucket" "mysql_backup_task2" {
     }
   }
 }
+resource "time_sleep" "wait_30_seconds" {
+  create_duration = "30s"
+}
 resource "kubernetes_namespace_v1" "namespace" {
   metadata {
     annotations = {
@@ -166,7 +169,7 @@ resource "kubernetes_namespace_v1" "namespace" {
 
     name = "yhonathan-camacho"
   }
-  depends_on = [google_container_cluster.private-cluster]
+  depends_on = [google_container_cluster.private-cluster, time_sleep.wait_30_seconds]
 }
 resource "kubernetes_deployment" "ghost-image" {
   metadata {
