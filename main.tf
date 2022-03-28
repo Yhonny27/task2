@@ -10,14 +10,6 @@ resource "google_project_iam_binding" "gke_usera" {
     "serviceAccount:${google_service_account.gke_user.email}",
   ]
 }
-resource "google_project_iam_binding" "store_userb" {
-  project = "projectx-344700"
-  role    = "roles/storage.objectAdmin"
-
-  members = [
-    "serviceAccount:${google_service_account.gke_user.email}",
-  ]
-}
 #. Create VPC network called "demo-network"
 resource "google_compute_network" "demo-network" {
   provider = google-beta
